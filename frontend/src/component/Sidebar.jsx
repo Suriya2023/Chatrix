@@ -77,7 +77,7 @@ const Sidebar = () => {
 
           <button className="flex items-center gap-1 text-sm lg:text-base font-medium text-primary hover:text-primary/80 transition">
             <UserPlus className="size-5" />
-            <span className="hidden sm:inline">Add Group</span>
+            <span className="hidden sm:inline">Create Group</span>
           </button>
         </div>
       </div>
