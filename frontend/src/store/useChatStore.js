@@ -1,7 +1,6 @@
-// ✅ useChatStore.js (Zustand Store)
 import { create } from 'zustand';
-import { axiosInstance } from '../Database/axios';
 import toast from 'react-hot-toast';
+import { axiosInstance } from '../Database/axios'; 
 import { useAuthStore } from './useAuthStore';
 
 export const useChatStore = create((set, get) => ({
@@ -10,7 +9,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
-  userLastActivityMap: {}, // ✅ New: Track last message time
+  userLastActivityMap: {},
 
   setSelectedUser: (user) => set({ selectedUser: user }),
 
@@ -50,7 +49,6 @@ export const useChatStore = create((set, get) => ({
   ToMessahes: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
-
     socket.on("newMessage", (newMessage) => {
       get().updateUserLastActivity(newMessage.senderId);
       set((state) => ({
@@ -74,4 +72,45 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response.data.message);
     }
   },
+
+  searchUsers: async (query) => {
+    try {
+      const res = await axiosInstance.get(`/users/search?query=${query}`);
+      return res.data;
+    } catch (err) {
+      toast.error("Search failed");
+      return [];
+    }
+  },
+
+  sendContactRequest: async (receiverId) => {
+    try {
+      await axiosInstance.post("/users/send-request", { receiverId });
+      toast.success("Request sent!");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Request failed");
+    }
+  },
+
+  getContactRequests: async () => {
+    try {
+      const res = await axiosInstance.get('/contacts/requests');
+      return res.data;
+    } catch (err) {
+      toast.error("Failed to fetch contact requests");
+      return [];
+    }
+  },
+  // Inside useChatStore
+  acceptedUsers: [],
+  getAcceptedUsers: async () => {
+    try {
+      const { data } = await axiosInstance.get("/contacts/accepted");
+      set({ acceptedUsers: data });
+    } catch (err) {
+      console.error("Failed to fetch accepted users", err);
+    }
+  },
+
+
 }));

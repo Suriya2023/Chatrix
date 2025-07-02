@@ -1,9 +1,9 @@
+// 📁 controllers/auth.controller.js
 import cloudinary from '../DataBase/clloudnary.js';
 import { generateToken } from '../DataBase/token.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 
-// ✅ Signup
 export const signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
@@ -28,12 +28,6 @@ export const signup = async (req, res) => {
     await newUser.save();
 
     const token = generateToken(newUser._id, res);
-
-    // 🧪 TEMP log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log("🔐 Token (Signup):", token);
-    }
-
     res.status(201).json({
       _id: newUser._id,
       fullName: newUser.fullName,
@@ -46,11 +40,9 @@ export const signup = async (req, res) => {
   }
 };
 
-// ✅ Login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
@@ -58,12 +50,6 @@ export const login = async (req, res) => {
     if (!isPasswordMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = generateToken(user._id, res);
-
-    // 🧪 TEMP log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log("🔐 Token (Login):", token);
-    }
-
     res.status(200).json({
       _id: user._id,
       fullName: user.fullName,
@@ -76,7 +62,6 @@ export const login = async (req, res) => {
   }
 };
 
-// ✅ Logout
 export const logout = (req, res) => {
   try {
     res.cookie("jwt", "", {
@@ -85,12 +70,6 @@ export const logout = (req, res) => {
       sameSite: "Strict",
       secure: process.env.NODE_ENV !== "development"
     });
-
-    // 🧪 TEMP log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log("✅ User logged out. Cookie cleared.");
-    }
-
     res.status(200).json({ message: "Logout successfully" });
   } catch (err) {
     console.error("Logout error:", err.message);
@@ -98,23 +77,15 @@ export const logout = (req, res) => {
   }
 };
 
-// ✅ Update Profile
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
     const userId = req.user._id;
-
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
-    }
-
+    if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePic: uploadResponse.secure_url },
-      { new: true }
-    );
-
+    const updatedUser = await User.findByIdAndUpdate(userId, {
+      profilePic: uploadResponse.secure_url
+    }, { new: true });
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error("Update profile error:", error.message);
@@ -122,18 +93,9 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// ✅ Check Auth
 export const checkAuth = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    // 🧪 TEMP log for development
-    if (process.env.NODE_ENV === 'development') {
-      console.log("🔎 Authenticated User:", req.user);
-    }
-
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     res.status(200).json(req.user);
   } catch (error) {
     console.error("Auth check error:", error.message);
