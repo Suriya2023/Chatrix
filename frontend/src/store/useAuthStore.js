@@ -34,7 +34,7 @@ export const useAuthStore = create((set, get) => ({
             get().connectSocket();
         } catch (error) {
 
-            toast.error(errorMsg);
+            toast.error(errorMsg); toast.error(error.response?.data?.message || "Signup failed");
         }
 
         finally {
@@ -52,7 +52,7 @@ export const useAuthStore = create((set, get) => ({
 
 
         } catch (error) {
-            toast.error("Something went wrong during Login");
+            toast.error(error.response?.data?.message || "Something went wrong during Login");
         } finally {
             set({ isLogging: false });
         }
