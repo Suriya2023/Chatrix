@@ -3,7 +3,7 @@ import { axiosInstance } from '../Database/axios';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 
-const BASE_SOCKET_URL = "https://chatrix-49uu.onrender.com/api"; // No /api here
+const BASE_SOCKET_URL = "http://localhost:5005"; // No /api here
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
