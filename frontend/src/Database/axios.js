@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5005/api',
+  baseURL: 'https://chatrix-49uu.onrender.com/api',
   withCredentials: true,
 });
